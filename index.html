@@ -1,22 +1,61 @@
-<!-- disclaimer.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Event Disclaimer</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note ta bière !</title>
+    <style>
+        body { font-family: Arial; text-align: center; background: #f9f5e6; }
+        form { margin: 2em auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px #ccc; max-width: 400px; padding: 2em; }
+        img { width: 120px; margin-bottom: 1em; }
+        label { display: block; margin: 1em 0 0.5em; }
+        input[type=range] { width: 80%; }
+        button { margin-top: 1em; padding: 0.5em 2em; font-size: 1em; border-radius: 7px; background: #ffe066; border: none; cursor: pointer; }
+    </style>
 </head>
 <body>
-    <h2>Event Disclaimer</h2>
-    <p>
-        By signing below, I understand that this event involves physical activity and there is a risk of injury.
-        I acknowledge that the organizers are not responsible for any injuries that may occur.
-    </p>
-    <form action="https://formspree.io/f/your-form-id" method="POST">
-        <input type="text" name="name" placeholder="Your Name" required><br><br>
-        <input type="email" name="email" placeholder="Your Email" required><br><br>
-        <label><input type="checkbox" name="agree" required> I agree to the terms</label><br><br>
-        <button type="submit">Sign</button>
+    <img src="logo.png" alt="Logo">
+    <h1>Note ta bière !</h1>
+    <form id="beerForm">
+        <label>Nom : <input type="text" name="nom" required></label>
+        <label>Âge : <input type="number" name="age" min="10" max="99" required></label>
+        <label>
+            Goût de la bière :
+            <input type="range" name="gout" min="0" max="10" value="5" oninput="goutVal.value = this.value">
+            <output id="goutVal">5</output>/10
+        </label>
+        <label>
+            Note du logo :
+            <input type="range" name="logo" min="0" max="10" value="5" oninput="logoVal.value = this.value">
+            <output id="logoVal">5</output>/10
+        </label>
+        <button type="submit">Valider</button>
     </form>
+    <div id="msg"></div>
+    <script>
+        // Affichage valeurs curseurs
+        const gout = document.querySelector('input[name="gout"]');
+        const logo = document.querySelector('input[name="logo"]');
+        const goutVal = document.getElementById('goutVal');
+        const logoVal = document.getElementById('logoVal');
+        gout.addEventListener('input', () => goutVal.textContent = gout.value);
+        logo.addEventListener('input', () => logoVal.textContent = logo.value);
+
+        document.getElementById('beerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                nom: e.target.nom.value,
+                age: e.target.age.value,
+                gout: e.target.gout.value,
+                logo: e.target.logo.value
+            };
+            const response = await fetch("TON_URL_SCRIPT_GOOGLE", {
+                method: "POST",
+                body: JSON.stringify(data),
+                headers: { "Content-Type": "application/json" }
+            });
+            document.getElementById('msg').textContent = response.ok ? "Merci pour ton avis !" : "Erreur, réessaie plus tard.";
+            e.target.reset();
+        });
+    </script>
 </body>
 </html>
