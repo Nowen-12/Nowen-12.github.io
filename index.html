@@ -3,95 +3,48 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Note ta bière !</title>
-    <style>
-        body {
-            font-family: Arial;
-            text-align: center;
-            background: #f9f5e6;
-        }
-
-        form {
-            margin: 2em auto;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px #ccc;
-            max-width: 400px;
-            padding: 2em;
-        }
-
-        img {
-            width: 120px;
-            margin-bottom: 1em;
-        }
-
-        label {
-            display: block;
-            margin: 1em 0 0.5em;
-        }
-
-        input[type=range] {
-            width: 80%;
-        }
-
-        button {
-            margin-top: 1em;
-            padding: 0.5em 2em;
-            font-size: 1em;
-            border-radius: 7px;
-            background: #ffe066;
-            border: none;
-            cursor: pointer;
-        }
-    </style>
+    <title>Envoi vers Firestore</title>
 </head>
 
 <body>
-    <img src="logo.png" alt="Logo">
-    <h1>Note ma bière ! V5</h1>
-    <form id="beerForm">
-        <label>Nom : <input type="text" name="nom" required></label>
-        <label>Âge : <input type="number" name="age" min="10" max="99" required></label>
-        <label>
-            Goût de la bière :
-            <input type="range" name="gout" min="0" max="10" value="8" oninput="goutVal.value = this.value">
-            <output id="goutVal">8</output>/10
-        </label>
-        <label>
-            Note du logo :
-            <input type="range" name="logo" min="0" max="10" value="8" oninput="logoVal.value = this.value">
-            <output id="logoVal">8</output>/10
-        </label>
-        <button type="submit">Valider</button>
+    <form id="dataForm">
+        <label for="name">Nom :</label>
+        <input type="text" id="name" required>
+        <button type="submit">Publier</button>
     </form>
-    <div id="msg"></div>
-    <script>
-        // Affichage valeurs curseurs
-        const gout = document.querySelector('input[name="gout"]');
-        const logo = document.querySelector('input[name="logo"]');
-        const goutVal = document.getElementById('goutVal');
-        const logoVal = document.getElementById('logoVal');
-        gout.addEventListener('input', () => goutVal.textContent = gout.value);
-        logo.addEventListener('input', () => logoVal.textContent = logo.value);
+    <div id="result"></div>
 
-        document.getElementById('beerForm').addEventListener('submit', async (e) => {
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDeS8UJ0M688FRWtTHm0aYrt_v1r5mlbIo",
+            authDomain: "gingerform.firebaseapp.com",
+            projectId: "gingerform",
+            storageBucket: "gingerform.firebasestorage.app",
+            messagingSenderId: "215283939680",
+            appId: "1:215283939680:web:2835759898fbc524fb0605",
+            measurementId: "G-LGG78H2T8G"
+        };
+
+        // Initialisation Firebase et Firestore
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        // Gestion du formulaire
+        document.getElementById('dataForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const data = {
-                nom: e.target.nom.value,
-                age: e.target.age.value,
-                gout: e.target.gout.value,
-                logo: e.target.logo.value
-            };
-            // Encode en URL
-            const params = new URLSearchParams(data).toString();
-
-            const response = await fetch('https://script.google.com/macros/s/AKfycbxBj1mz9wllnK75EKDd6PdgN1M9eZ3rmZ0PLBoBFCvtRRhAt6fZKoq9ftZpAWbS-ULg/exec', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: params
-            });
-            document.getElementById('msg').textContent = response.ok ? "Merci pour ton avis !" : "Erreur, réessaie plus tard.";
-            e.target.reset();
+            const name = document.getElementById('name').value;
+            try {
+                // Ajoute un document dans la collection "users"
+                await addDoc(collection(db, "users"), { name });
+                document.getElementById('result').textContent = "Nom publié dans Firestore !";
+            } catch (err) {
+                document.getElementById('result').textContent = "Erreur : " + err.message;
+            }
         });
     </script>
 </body>
