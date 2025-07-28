@@ -1,17 +1,51 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <title>Note ta bière !</title>
     <style>
-        body { font-family: Arial; text-align: center; background: #f9f5e6; }
-        form { margin: 2em auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px #ccc; max-width: 400px; padding: 2em; }
-        img { width: 120px; margin-bottom: 1em; }
-        label { display: block; margin: 1em 0 0.5em; }
-        input[type=range] { width: 80%; }
-        button { margin-top: 1em; padding: 0.5em 2em; font-size: 1em; border-radius: 7px; background: #ffe066; border: none; cursor: pointer; }
+        body {
+            font-family: Arial;
+            text-align: center;
+            background: #f9f5e6;
+        }
+
+        form {
+            margin: 2em auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #ccc;
+            max-width: 400px;
+            padding: 2em;
+        }
+
+        img {
+            width: 120px;
+            margin-bottom: 1em;
+        }
+
+        label {
+            display: block;
+            margin: 1em 0 0.5em;
+        }
+
+        input[type=range] {
+            width: 80%;
+        }
+
+        button {
+            margin-top: 1em;
+            padding: 0.5em 2em;
+            font-size: 1em;
+            border-radius: 7px;
+            background: #ffe066;
+            border: none;
+            cursor: pointer;
+        }
     </style>
 </head>
+
 <body>
     <img src="logo.png" alt="Logo">
     <h1>Note ta bière !</h1>
@@ -48,7 +82,7 @@
                 gout: e.target.gout.value,
                 logo: e.target.logo.value
             };
-            const response = await fetch("https://script.google.com/macros/s/AKfycbx4CXEgAUc8WJ4JsMvaJjOHi7WGdVT1vcTyorhycQwq3JYh64nQkyMGEGgPjTVa-LZe/exec", {
+            const response = await fetch("https://script.google.com/macros/s/AKfycbx2E1WrAuRmbc_xAtW3gT5luVj5-3g85LnS0ZYs_JNQ6r77A8rCk6XOkGXMMSUNNO3V/exec", {
                 method: "POST",
                 body: JSON.stringify(data),
                 headers: { "Content-Type": "application/json" }
@@ -58,4 +92,5 @@
         });
     </script>
 </body>
+
 </html>
