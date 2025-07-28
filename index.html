@@ -48,7 +48,7 @@
 
 <body>
     <img src="logo.png" alt="Logo">
-    <h1>Note ma bière ! V3</h1>
+    <h1>Note ma bière ! V4</h1>
     <form id="beerForm">
         <label>Nom : <input type="text" name="nom" required></label>
         <label>Âge : <input type="number" name="age" min="10" max="99" required></label>
@@ -82,10 +82,10 @@
                 gout: e.target.gout.value,
                 logo: e.target.logo.value
             };
-            const response = await fetch("https://script.google.com/macros/s/AKfycbyFhTJIGIC74tgv56eGRah-OnYBkFn5f2uOrdBUvv16kS1DkiLyCc7uPk6i60XY2msW/exec", {
-                method: "POST",
-                body: JSON.stringify(data),
-                headers: { "Content-Type": "application/json" }
+            const response = await fetch('https://script.google.com/macros/s/AKfycbyFhTJIGIC74tgv56eGRah-OnYBkFn5f2uOrdBUvv16kS1DkiLyCc7uPk6i60XY2msW/exec', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'nom=Nowen&age=23&gout=bitter&logo=beer'
             });
             document.getElementById('msg').textContent = response.ok ? "Merci pour ton avis !" : "Erreur, réessaie plus tard.";
             e.target.reset();
