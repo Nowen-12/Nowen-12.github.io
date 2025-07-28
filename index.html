@@ -55,12 +55,12 @@
         <label>
             Goût de la bière :
             <input type="range" name="gout" min="0" max="10" value="5" oninput="goutVal.value = this.value">
-            <output id="goutVal">5</output>/10
+            <output id="goutVal">8</output>/10
         </label>
         <label>
             Note du logo :
             <input type="range" name="logo" min="0" max="10" value="5" oninput="logoVal.value = this.value">
-            <output id="logoVal">5</output>/10
+            <output id="logoVal">8</output>/10
         </label>
         <button type="submit">Valider</button>
     </form>
@@ -82,7 +82,7 @@
                 gout: e.target.gout.value,
                 logo: e.target.logo.value
             };
-            const response = await fetch("https://script.google.com/macros/s/AKfycbzy8by8taLrWkDdCuR3rYEgdQtaKdQW6Uq-FdsyMuh63Z0RQOq8Ct1znZNkJfRjwmuf/exec", {
+            const response = await fetch("https://script.google.com/macros/s/AKfycbxuIDdCHCrvIodu799fAuhyAKDMzg2Mb1FCA9ebYIZb2su5mTYcSIoMF9ZZ04TBdhgA/exec", {
                 method: "POST",
                 body: JSON.stringify(data),
                 headers: { "Content-Type": "application/json" }
