@@ -102,8 +102,9 @@
                 date: new Date().toISOString()
             };
             try {
-                await addDoc(collection(db, "bierNotes"), data);
-                document.getElementById('msg').textContent = "Merci pour ton avis !";
+                // Ajoute le document dans la collection "notes" avec un id auto-généré par Firestore
+                const docRef = await addDoc(collection(db, "notes"), data);
+                document.getElementById('msg').textContent = `Merci pour ton avis ! (ID unique : ${docRef.id})`;
                 e.target.reset();
                 goutVal.textContent = "8";
                 logoVal.textContent = "8";
