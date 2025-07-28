@@ -48,7 +48,7 @@
                 gout: e.target.gout.value,
                 logo: e.target.logo.value
             };
-            const response = await fetch("TON_URL_SCRIPT_GOOGLE", {
+            const response = await fetch("https://script.google.com/macros/s/AKfycbzjNMSm2eKWMy8KduhJ4-RE9yf7FaJ95lVz0I4pfkGL9JIVPgfV2tNaTwnfRav67np-/exec", {
                 method: "POST",
                 body: JSON.stringify(data),
                 headers: { "Content-Type": "application/json" }
