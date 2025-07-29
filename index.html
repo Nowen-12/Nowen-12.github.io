@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Note ma bière ! V7</title>
+    <title>Note ma bière ! V0.8</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -47,10 +47,12 @@
             box-shadow: 0 4px 16px #e9e2c780, 0 1px 4px #f0e9d2;
             padding: 2em 1.2em 1.2em 1.2em;
             width: 100%;
+            max-width: 400px;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
             gap: 1.15em;
+            overflow: hidden; /* Fixes textarea overflow */
         }
         label {
             display: flex;
@@ -60,6 +62,7 @@
             margin-bottom: 0.3em;
         }
         input[type="text"], input[type="number"] {
+            width: 100%;
             padding: 0.55em 1em;
             border-radius: 8px;
             border: 1px solid #ecd97f;
@@ -68,6 +71,7 @@
             background: #fff;
             margin-top: 0.35em;
             transition: border 0.18s;
+            box-sizing: border-box;
         }
         input[type="text"]:focus, input[type="number"]:focus {
             border: 1.5px solid #bfa24a;
@@ -86,6 +90,7 @@
             margin-top: 0.6em;
             background: none;
             height: 4px;
+            box-sizing: border-box;
         }
         output {
             font-weight: bold;
@@ -107,6 +112,7 @@
             resize: vertical;
             box-shadow: 0 1px 4px #ecd97f33;
             margin-top: 0.3em;
+            box-sizing: border-box; /* Ensures padding doesn't overflow */
             transition: border 0.2s;
         }
         textarea:focus {
