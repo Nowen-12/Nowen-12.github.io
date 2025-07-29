@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8">
-    <title>Note ta bière !</title>
+    <title>Note ma bière !</title>
     <style>
         body {
             font-family: Arial;
@@ -43,12 +42,16 @@
             border: none;
             cursor: pointer;
         }
+        #msg {
+            margin-top: 2em;
+            font-weight: bold;
+        }
     </style>
 </head>
 
 <body>
     <img src="logo.png" alt="Logo">
-    <h1>Note ma bière ! V5</h1>
+    <h1>Note ma bière ! V6</h1>
     <form id="beerForm">
         <label>Nom : <input type="text" name="nom" required></label>
         <label>Âge : <input type="number" name="age" min="10" max="99" required></label>
@@ -68,6 +71,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDeS8UJ0M688FRWtTHm0aYrt_v1r5mlbIo",
@@ -82,6 +86,21 @@
         // Initialise Firebase et Firestore
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let userId = null;
+
+        // Authentification anonyme à l'ouverture de la page
+        signInAnonymously(auth).catch((error) => {
+            document.getElementById('msg').textContent = "Erreur d'authentification Firebase.";
+        });
+
+        // Mémorise l'ID utilisateur
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                userId = user.uid;
+            }
+        });
 
         // Curseurs dynamiques
         const gout = document.querySelector('input[name="gout"]');
@@ -94,15 +113,19 @@
         // Soumission du formulaire
         document.getElementById('beerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!userId) {
+                document.getElementById('msg').textContent = "Attendez l'authentification, puis réessayez.";
+                return;
+            }
             const data = {
                 nom: e.target.nom.value,
                 age: parseInt(e.target.age.value, 10),
                 gout: parseInt(e.target.gout.value, 10),
                 logo: parseInt(e.target.logo.value, 10),
-                date: new Date().toISOString()
+                date: new Date().toISOString(),
+                userId: userId
             };
             try {
-                // Ajoute le document dans la collection "notes" avec un id auto-généré par Firestore
                 const docRef = await addDoc(collection(db, "notes"), data);
                 document.getElementById('msg').textContent = `Merci pour ton avis ! (ID unique : ${docRef.id})`;
                 e.target.reset();
@@ -114,5 +137,4 @@
         });
     </script>
 </body>
-
 </html>
