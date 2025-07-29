@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Note ma bière !</title>
+    <title>Note ma bière ! V7</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -11,6 +11,11 @@
             margin: 0;
             min-height: 100vh;
             color: #5c4d15;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding-top: 32px;
         }
         .main-flex {
             display: flex;
@@ -96,11 +101,26 @@
             height: 4px;
             box-sizing: border-box;
         }
+        .note-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25em;
+            font-size: 1.19em;
+            font-weight: bold;
+            color: #bfa24a;
+            margin-left: 0.5em;
+        }
         output {
             font-weight: bold;
             color: #bfa24a;
             font-size: 1.19em;
-            margin-left: 0.5em;
+            margin: 0;
+        }
+        .slash10 {
+            font-weight: normal;
+            color: #5c4d15;
+            font-size: 1em;
+            margin-left: 0.1em;
         }
         .range-row {
             margin-bottom: 0.7em;
@@ -187,7 +207,7 @@
                 <img src="logo.png" alt="Logo Racine Dorée">
             </div>
             <form id="beerForm" class="form-card">
-                <h1>Note ma bière ! V0.8</h1>
+                <h1>Note ma bière ! V0.9</h1>
                 <label>Nom :
                     <input type="text" name="nom" required placeholder="Ton prénom ou pseudo">
                 </label>
@@ -197,15 +217,15 @@
                 <div class="range-row">
                     <label class="range-label">
                         Goût de la bière :
-                        <input type="range" name="gout" min="0" max="10" value="8" oninput="goutVal.value = this.value">
-                        <output id="goutVal">8</output>/10
+                        <input type="range" name="gout" min="0" max="10" value="8" oninput="goutVal.textContent = this.value">
+                        <span class="note-inline"><output id="goutVal">8</output><span class="slash10">/10</span></span>
                     </label>
                 </div>
                 <div class="range-row">
                     <label class="range-label">
                         Note du logo :
-                        <input type="range" name="logo" min="0" max="10" value="8" oninput="logoVal.value = this.value">
-                        <output id="logoVal">8</output>/10
+                        <input type="range" name="logo" min="0" max="10" value="8" oninput="logoVal.textContent = this.value">
+                        <span class="note-inline"><output id="logoVal">8</output><span class="slash10">/10</span></span>
                     </label>
                 </div>
                 <label>Commentaire :
