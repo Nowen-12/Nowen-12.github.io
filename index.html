@@ -122,6 +122,11 @@
             font-size: 1em;
             margin-left: 0.1em;
         }
+        .emoji-show {
+            font-size: 1.4em;
+            margin-left: 0.5em;
+            vertical-align: middle;
+        }
         .range-row {
             margin-bottom: 0.7em;
         }
@@ -207,7 +212,7 @@
                 <img src="logo.png" alt="Logo Racine Dorée">
             </div>
             <form id="beerForm" class="form-card">
-                <h1>Note ma bière ! V0.9</h1>
+                <h1>Note ma bière ! V0.10</h1>
                 <label>Nom :
                     <input type="text" name="nom" required placeholder="Ton prénom ou pseudo">
                 </label>
@@ -217,15 +222,23 @@
                 <div class="range-row">
                     <label class="range-label">
                         Goût de la bière :
-                        <input type="range" name="gout" min="0" max="10" value="8" oninput="goutVal.textContent = this.value">
-                        <span class="note-inline"><output id="goutVal">8</output><span class="slash10">/10</span></span>
+                        <input type="range" name="gout" min="0" max="10" value="8" oninput="updateGoutEmoji(this.value)">
+                        <span class="note-inline">
+                            <output id="goutVal">8</output>
+                            <span class="slash10">/10</span>
+                            <span id="goutEmoji" class="emoji-show">😍</span>
+                        </span>
                     </label>
                 </div>
                 <div class="range-row">
                     <label class="range-label">
                         Note du logo :
-                        <input type="range" name="logo" min="0" max="10" value="8" oninput="logoVal.textContent = this.value">
-                        <span class="note-inline"><output id="logoVal">8</output><span class="slash10">/10</span></span>
+                        <input type="range" name="logo" min="0" max="10" value="8" oninput="updateLogoEmoji(this.value)">
+                        <span class="note-inline">
+                            <output id="logoVal">8</output>
+                            <span class="slash10">/10</span>
+                            <span id="logoEmoji" class="emoji-show">🤩</span>
+                        </span>
                     </label>
                 </div>
                 <label>Commentaire :
@@ -270,13 +283,32 @@
             }
         });
 
-        // Curseurs dynamiques
+        // Emoji tables
+        const goutEmojis = ["🤢","😣","😖","😕","😐","🙂","😊","😋","😍","🤩","🍻"];
+        const logoEmojis = ["💩","🙈","😑","😕","😐","🙂","👍","😍","🤩","🌟","🏆"];
+
+        // Curseurs dynamiques avec emoji
         const gout = document.querySelector('input[name="gout"]');
         const logo = document.querySelector('input[name="logo"]');
         const goutVal = document.getElementById('goutVal');
         const logoVal = document.getElementById('logoVal');
-        gout.addEventListener('input', () => goutVal.textContent = gout.value);
-        logo.addEventListener('input', () => logoVal.textContent = logo.value);
+        const goutEmoji = document.getElementById('goutEmoji');
+        const logoEmoji = document.getElementById('logoEmoji');
+
+        function updateGoutEmoji(val) {
+            goutVal.textContent = val;
+            goutEmoji.textContent = goutEmojis[val];
+        }
+        function updateLogoEmoji(val) {
+            logoVal.textContent = val;
+            logoEmoji.textContent = logoEmojis[val];
+        }
+        // Init on page load
+        updateGoutEmoji(gout.value);
+        updateLogoEmoji(logo.value);
+
+        gout.addEventListener('input', () => updateGoutEmoji(gout.value));
+        logo.addEventListener('input', () => updateLogoEmoji(logo.value));
 
         // Soumission du formulaire
         document.getElementById('beerForm').addEventListener('submit', async (e) => {
@@ -298,8 +330,8 @@
                 const docRef = await addDoc(collection(db, "notes"), data);
                 document.getElementById('msg').textContent = `Merci pour ton avis ! 🍺 (ID : ${docRef.id})`;
                 e.target.reset();
-                goutVal.textContent = "8";
-                logoVal.textContent = "8";
+                updateGoutEmoji(8);
+                updateLogoEmoji(8);
             } catch (err) {
                 document.getElementById('msg').textContent = "Erreur, réessaie plus tard.";
             }
