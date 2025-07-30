@@ -17,7 +17,7 @@
             -ms-user-select: none;
             user-select: none;
         }
-        textarea, input, button, select {
+        textarea, input, button, select, label {
             -webkit-user-select: text !important;
             -moz-user-select: text !important;
             -ms-user-select: text !important;
@@ -81,6 +81,12 @@
             font-size: 1.06em;
             margin-bottom: 0.3em;
         }
+        .inline-check {
+            display: flex;
+            align-items: center;
+            gap: 0.7em;
+            margin-bottom: 0.7em;
+        }
         input[type="text"], input[type="number"] {
             width: 100%;
             padding: 0.55em 1em;
@@ -92,6 +98,10 @@
             margin-top: 0.35em;
             transition: border 0.18s;
             box-sizing: border-box;
+        }
+        input[type="text"]:disabled {
+            background: #f6f4ee;
+            color: #bdbdbd;
         }
         input[type="text"]:focus, input[type="number"]:focus {
             border: 1.5px solid #bfa24a;
@@ -270,10 +280,14 @@
             <div class="logo-side">
                 <img src="logo.png" alt="Logo Racine Dorée">
             </div>
-            <form id="beerForm" class="form-card">
-                <h1>Note ma bière ! V7</h1>
-                <label>Nom :
-                    <input type="text" name="nom" required placeholder="Ton prénom ou pseudo">
+            <form id="beerForm" class="form-card" autocomplete="off">
+                <h1>Note ma Ginger !</h1>
+                <div class="inline-check">
+                    <input type="checkbox" id="anonCheck" name="anonyme" value="anonyme">
+                    <label for="anonCheck" style="margin-bottom:0;">Je souhaite répondre en anonyme</label>
+                </div>
+                <label id="nomLabel">Nom :
+                    <input type="text" name="nom" id="nomInput" required placeholder="Ton prénom ou pseudo">
                 </label>
                 <label>Âge :
                     <input type="number" name="age" min="10" max="99" required placeholder="Ton âge">
@@ -369,6 +383,22 @@
         gout.addEventListener('input', () => updateGoutEmoji(gout.value));
         logo.addEventListener('input', () => updateLogoEmoji(logo.value));
 
+        // Gestion case Anonyme
+        const anonCheck = document.getElementById('anonCheck');
+        const nomInput = document.getElementById('nomInput');
+        anonCheck.addEventListener('change', function() {
+            if (this.checked) {
+                nomInput.value = "";
+                nomInput.disabled = true;
+                nomInput.required = false;
+                nomInput.placeholder = "Réponse anonyme";
+            } else {
+                nomInput.disabled = false;
+                nomInput.required = true;
+                nomInput.placeholder = "Ton prénom ou pseudo";
+            }
+        });
+
         // Message feedback
         function showMsg(msg, isError = false) {
             const msgDiv = document.getElementById('msg');
@@ -404,8 +434,11 @@
             // Affiche le bandeau immédiatement
             showMsg("Envoi en cours...", false);
 
+            let nom = nomInput.disabled ? "Anonyme" : nomInput.value.trim();
+            if (!nom) nom = "Anonyme";
+
             const data = {
-                nom: e.target.nom.value,
+                nom: nom,
                 age: parseInt(e.target.age.value, 10),
                 gout: parseInt(e.target.gout.value, 10),
                 logo: parseInt(e.target.logo.value, 10),
@@ -419,6 +452,10 @@
                 e.target.reset();
                 updateGoutEmoji(8);
                 updateLogoEmoji(8);
+                nomInput.disabled = false;
+                nomInput.required = true;
+                nomInput.placeholder = "Ton prénom ou pseudo";
+                anonCheck.checked = false;
             } catch (err) {
                 showMsg("Erreur, réessaie plus tard.", true);
             }
