@@ -11,6 +11,16 @@
             margin: 0;
             min-height: 100vh;
             color: #5c4d15;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        textarea, input, button, select {
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
+            user-select: text !important;
         }
         .container {
             max-width: 1100px;
@@ -179,9 +189,15 @@
         }
         @media (max-width: 900px) {
             .main-flex {
-                flex-direction: column;
+                flex-direction: column !important;
                 align-items: center;
                 gap: 18px;
+            }
+            .logo-side {
+                width: 100%;
+                justify-content: center;
+                align-items: center;
+                margin-bottom: 16px;
             }
             .logo-side img {
                 height: 140px;
@@ -212,7 +228,7 @@
                 <img src="logo.png" alt="Logo Racine Dorée">
             </div>
             <form id="beerForm" class="form-card">
-                <h1>Note ma bière ! V0.10</h1>
+                <h1>Note ma bière ! V7</h1>
                 <label>Nom :
                     <input type="text" name="nom" required placeholder="Ton prénom ou pseudo">
                 </label>
@@ -284,7 +300,7 @@
         });
 
         // Emoji tables
-        const goutEmojis = ["🤢","😣","😖","😕","😐","🙂","😊","😋","😍","🤩","🍻"];
+        const goutEmojis = ["🤢","😖","😣","😕","😐","🙂","😊","😋","😍","🤩","🍻"];
         const logoEmojis = ["💩","🙈","😑","😕","😐","🙂","👍","😍","🤩","🌟","🏆"];
 
         // Curseurs dynamiques avec emoji
