@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Statistiques Racine Dorée</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Quicksand', Arial, sans-serif;
+            background: linear-gradient(120deg, #f6f4ee 60%, #fceabb 100%);
+            margin: 0;
+            min-height: 100vh;
+            color: #5c4d15;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 36px 12px;
+        }
+        h1 {
+            font-size: 2em;
+            color: #bfa24a;
+            text-align: center;
+            margin-bottom: 32px;
+            letter-spacing: 1px;
+        }
+        .chart-section {
+            background: #fffbe7;
+            border-radius: 18px;
+            box-shadow: 0 4px 16px #ecd97f44, 0 1px 4px #f0e9d2;
+            padding: 2em 1em;
+            margin-bottom: 32px;
+        }
+        canvas {
+            max-width: 100%;
+            height: auto !important;
+        }
+        .comment-section {
+            background: #fffbe7;
+            border-radius: 18px;
+            box-shadow: 0 4px 16px #ecd97f44, 0 1px 4px #f0e9d2;
+            padding: 2em 1em;
+        }
+        .comment {
+            margin-bottom: 1.2em;
+            border-bottom: 1px solid #ecd97f88;
+            padding-bottom: 0.7em;
+        }
+        .comment:last-child {
+            border-bottom: none;
+        }
+        .note-emoji {
+            font-size: 1.35em;
+            margin: 0 0.4em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Statistiques Racine Dorée</h1>
+        <div class="chart-section">
+            <canvas id="notesChart" width="400" height="220"></canvas>
+            <div id="statsInfo" style="margin-top:2em; text-align:center;"></div>
+        </div>
+        <div class="comment-section">
+            <h2 style="text-align:center; color:#bfa24a;">Derniers avis</h2>
+            <div id="comments"></div>
+        </div>
+    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDeS8UJ0M688FRWtTHm0aYrt_v1r5mlbIo",
+            authDomain: "gingerform.firebaseapp.com",
+            projectId: "gingerform",
+            storageBucket: "gingerform.firebasestorage.app",
+            messagingSenderId: "215283939680",
+            appId: "1:215283939680:web:2835759898fbc524fb0605",
+            measurementId: "G-LGG78H2T8G"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const goutEmojis = ["🤢","😣","😖","😕","😐","🙂","😊","😋","😍","🤩","🍻"];
+        const logoEmojis = ["💩","🙈","😑","😕","😐","🙂","👍","😍","🤩","🌟","🏆"];
+
+        async function fetchNotes() {
+            const notesSnap = await getDocs(collection(db, "notes"));
+            const notes = [];
+            notesSnap.forEach(doc => notes.push(doc.data()));
+            return notes;
+        }
+
+        function moyenne(arr) {
+            return arr.length ? (arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(2) : 0;
+        }
+        function distribution(arr) {
+            const dist = Array(11).fill(0);
+            arr.forEach(val => dist[val]++);
+            return dist;
+        }
+
+        async function showStats() {
+            const notes = await fetchNotes();
+            const goutNotes = notes.map(n => n.gout);
+            const logoNotes = notes.map(n => n.logo);
+
+            // Graphique
+            const ctx = document.getElementById('notesChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Array.from({length:11},(_,i)=>i),
+                    datasets: [
+                        {
+                            label: "Goût de la bière",
+                            data: distribution(goutNotes),
+                            backgroundColor: "#ffca63"
+                        },
+                        {
+                            label: "Logo",
+                            data: distribution(logoNotes),
+                            backgroundColor: "#bfa24a"
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        x: { title: { display: true, text: 'Note (/10)' } },
+                        y: { title: { display: true, text: 'Nombre de votes' }, beginAtZero: true }
+                    }
+                }
+            });
+
+            // Moyennes et totaux
+            document.getElementById('statsInfo').innerHTML =
+                `<span class="note-emoji">${goutEmojis[Math.round(moyenne(goutNotes))]}</span>
+                Moyenne goût : <b>${moyenne(goutNotes)} / 10</b> &nbsp; | &nbsp; 
+                <span class="note-emoji">${logoEmojis[Math.round(moyenne(logoNotes))]}</span>
+                Moyenne logo : <b>${moyenne(logoNotes)} / 10</b> <br>
+                Nombre d'avis : <b>${notes.length}</b>`;
+
+            // Derniers commentaires
+            let commentsHtml = '';
+            notes
+                .filter(n => n.commentaire && n.commentaire.length)
+                .sort((a,b)=>(b.date||'').localeCompare(a.date||'')) // plus récents d'abord
+                .slice(0,10)
+                .forEach(n => {
+                    commentsHtml += `
+                    <div class="comment">
+                        <b>${n.nom ? n.nom : "Anonyme"}</b> (${n.age ? n.age : "?"} ans)
+                        <br>
+                        <span class="note-emoji">${goutEmojis[n.gout]||""}</span>
+                        Goût : <b>${n.gout}/10</b> &nbsp; | &nbsp;
+                        <span class="note-emoji">${logoEmojis[n.logo]||""}</span>
+                        Logo : <b>${n.logo}/10</b>
+                        <br>
+                        <span style="color:#5c4d15;">${n.commentaire}</span>
+                        <br>
+                        <span style="font-size:0.8em;color:#bfa24a;">
+                            ${n.date ? new Date(n.date).toLocaleString("fr-FR") : ""}
+                        </span>
+                    </div>`;
+                });
+            document.getElementById('comments').innerHTML = commentsHtml || "<i>Aucun commentaire pour l'instant.</i>";
+        }
+
+        showStats();
+    </script>
+</body>
+</html>
