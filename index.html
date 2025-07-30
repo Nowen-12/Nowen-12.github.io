@@ -181,12 +181,29 @@
         #msg {
             margin-top: 2em;
             font-weight: bold;
-            font-size: 1.09em;
-            color: #bfa24a;
-            min-height: 2em;
+            font-size: 1.2em;
+            color: #fff;
+            background: linear-gradient(90deg, #ecd97f 65%, #bfa24a 100%);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px #ecd97f55;
+            padding: 1em 2em;
+            min-height: 3em;
             text-align: center;
-            transition: color 0.2s;
+            transition: color 0.2s, background 0.2s;
+            letter-spacing: 1px;
+            display: none;
+            /* hidden by default */
         }
+        #msg.active {
+            display: block;
+            animation: msgPop 0.5s;
+        }
+        @keyframes msgPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            70% { transform: scale(1.05); opacity: 1;}
+            100% { transform: scale(1); opacity: 1;}
+        }
+
         /* Mobile: logo au dessus du formulaire, centré */
         @media (max-width: 900px) {
             .main-flex {
@@ -200,11 +217,14 @@
                 align-items: center !important;
                 margin-bottom: 0;
                 margin-top: 0;
+                order: -1;
             }
             .logo-side img {
-                height: 120px;
-                max-width: 80vw;
+                height: 110px;
+                max-width: 70vw;
                 margin-bottom: 8px;
+                margin-left: auto;
+                margin-right: auto;
             }
             .form-card {
                 width: 98vw;
@@ -231,7 +251,7 @@
                 <img src="logo.png" alt="Logo Racine Dorée">
             </div>
             <form id="beerForm" class="form-card">
-                <h1>Note ma bière ! V7</h1>
+                <h1>Note ma Ginger !</h1>
                 <label>Nom :
                     <input type="text" name="nom" required placeholder="Ton prénom ou pseudo">
                 </label>
@@ -264,9 +284,9 @@
                     <textarea name="commentaire" maxlength="500" placeholder="Donne ton avis, tes suggestions, ton expérience..."></textarea>
                 </label>
                 <button type="submit">Valider</button>
-                <div id="msg"></div>
             </form>
         </div>
+        <div id="msg"></div>
     </div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
@@ -292,7 +312,7 @@
 
         // Authentification anonyme à l'ouverture de la page
         signInAnonymously(auth).catch((error) => {
-            document.getElementById('msg').textContent = "Erreur d'authentification Firebase.";
+            showMsg("Erreur d'authentification Firebase.", true);
         });
 
         // Mémorise l'ID utilisateur
@@ -329,11 +349,28 @@
         gout.addEventListener('input', () => updateGoutEmoji(gout.value));
         logo.addEventListener('input', () => updateLogoEmoji(logo.value));
 
+        // Message feedback
+        function showMsg(msg, isError = false) {
+            const msgDiv = document.getElementById('msg');
+            msgDiv.textContent = msg;
+            msgDiv.classList.add("active");
+            if (isError) {
+                msgDiv.style.background = "linear-gradient(90deg, #bfa24a 60%, #f44336 100%)";
+                msgDiv.style.color = "#fff";
+            } else {
+                msgDiv.style.background = "linear-gradient(90deg, #ecd97f 65%, #bfa24a 100%)";
+                msgDiv.style.color = "#fff";
+            }
+            setTimeout(() => {
+                msgDiv.classList.remove("active");
+            }, 6000);
+        }
+
         // Soumission du formulaire
         document.getElementById('beerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!userId) {
-                document.getElementById('msg').textContent = "Attendez l'authentification, puis réessayez.";
+                showMsg("Attendez l'authentification, puis réessayez.", true);
                 return;
             }
             const data = {
@@ -347,12 +384,12 @@
             };
             try {
                 const docRef = await addDoc(collection(db, "notes"), data);
-                document.getElementById('msg').textContent = `Merci pour ton avis ! 🍺 (ID : ${docRef.id})`;
+                showMsg("✔️ Merci pour ton avis ! Il a bien été enregistré 🍺");
                 e.target.reset();
                 updateGoutEmoji(8);
                 updateLogoEmoji(8);
             } catch (err) {
-                document.getElementById('msg').textContent = "Erreur, réessaie plus tard.";
+                showMsg("Erreur, réessaie plus tard.", true);
             }
         });
     </script>
