@@ -64,7 +64,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Statistiques Racine Dorée</h1>
+        <h1>Statistiques de Racine Dorée</h1>
         <div class="chart-section">
             <canvas id="notesChart" width="400" height="220"></canvas>
             <div id="statsInfo" style="margin-top:2em; text-align:center;"></div>
@@ -111,8 +111,8 @@
         }
 
         function updateStats(notes) {
-            const goutNotes = notes.map(n => n.gout);
-            const logoNotes = notes.map(n => n.logo);
+            const goutNotes = notes.map(function(n){return n.gout;});
+            const logoNotes = notes.map(function(n){return n.logo;});
 
             // Histogramme
             const ctx = document.getElementById('notesChart').getContext('2d');
@@ -123,7 +123,7 @@
             notesChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: Array.from({length:11},(_,i)=>i),
+                    labels: Array.from({length:11},function(_,i){return i;}),
                     datasets: [
                         {
                             label: "Goût de la bière",
@@ -147,11 +147,11 @@
 
             // Moyennes et totaux
             document.getElementById('statsInfo').innerHTML =
-                `<span class="note-emoji">${goutEmojis[Math.round(moyenne(goutNotes))]}</span>
-                Moyenne goût : <b>${moyenne(goutNotes)} / 10</b> &nbsp; | &nbsp; 
-                <span class="note-emoji">${logoEmojis[Math.round(moyenne(logoNotes))]}</span>
-                Moyenne logo : <b>${moyenne(logoNotes)} / 10</b> <br>
-                Nombre d'avis : <b>${notes.length}</b>`;
+                '<span class="note-emoji">'+goutEmojis[Math.round(moyenne(goutNotes))]+'</span>'
+                + ' Moyenne goût : <b>'+moyenne(goutNotes)+' / 10</b> &nbsp; | &nbsp; '
+                + '<span class="note-emoji">'+logoEmojis[Math.round(moyenne(logoNotes))]+'</span>'
+                + ' Moyenne logo : <b>'+moyenne(logoNotes)+' / 10</b> <br>'
+                + 'Nombre d\'avis : <b>'+notes.length+'</b>';
 
             // --- Matrix chart : Goût vs âge ---
             const ageBins = [
@@ -163,17 +163,17 @@
                 {min:50, max:59, label:"50-59"},
                 {min:60, max:100, label:"60+"}
             ];
-            const notesMatrix = Array(ageBins.length).fill(0).map(()=>Array(11).fill(0));
-            notes.forEach(n => {
+            const notesMatrix = Array(ageBins.length).fill(0).map(function(){return Array(11).fill(0);});
+            notes.forEach(function(n) {
                 if (typeof n.age === "number" && typeof n.gout === "number") {
-                    const ageIdx = ageBins.findIndex(bin => n.age>=bin.min && n.age<=bin.max);
+                    var ageIdx = ageBins.findIndex(function(bin){return n.age>=bin.min && n.age<=bin.max;});
                     if (ageIdx>-1 && n.gout>=0 && n.gout<=10) notesMatrix[ageIdx][n.gout]++;
                 }
             });
             // Format pour Chart.js Matrix
-            const matrixData = [];
-            for (let i=0; i<ageBins.length; i++) {
-                for (let j=0; j<11; j++) {
+            var matrixData = [];
+            for (var i=0; i<ageBins.length; i++) {
+                for (var j=0; j<11; j++) {
                     matrixData.push({
                         x: j, // Note
                         y: i, // Tranche d'âge
@@ -184,13 +184,13 @@
             // Couleur heatmap
             function colorForValue(v) {
                 if (v === 0) return '#fffbe7';
-                const base = [255, 202, 99]; // jaune pâle
-                const max = [191, 162, 74]; // doré foncé
-                const ratio = Math.min(1,v/Math.max(1,Math.max(...notesMatrix.flat())));
-                const blend = base.map((b, idx) => Math.round(b + (max[idx]-b)*ratio));
-                return `rgb(${blend.join(',')})`;
+                var base = [255, 202, 99]; // jaune pâle
+                var max = [191, 162, 74]; // doré foncé
+                var ratio = Math.min(1,v/Math.max(1,Math.max.apply(null,notesMatrix.flat())));
+                var blend = base.map(function(b, idx) { return Math.round(b + (max[idx]-b)*ratio); });
+                return 'rgb('+blend.join(',')+')';
             }
-            const matrixCtx = document.getElementById('matrixChart').getContext('2d');
+            var matrixCtx = document.getElementById('matrixChart').getContext('2d');
             if (matrixChartInstance) {
                 matrixChartInstance.destroy();
                 matrixChartInstance = null;
@@ -206,8 +206,8 @@
                         },
                         borderColor: "#ecd97f",
                         borderWidth: 1,
-                        width: function({chart}) { return (chart.chartArea||{}).width/12; },
-                        height: function({chart}) { return (chart.chartArea||{}).height/ageBins.length; }
+                        width: function(context) { return (context.chart.chartArea||{}).width/12; },
+                        height: function(context) { return (context.chart.chartArea||{}).height/ageBins.length; }
                     }]
                 },
                 options: {
@@ -216,12 +216,12 @@
                         tooltip: {
                             callbacks: {
                                 title: function(ctx) {
-                                    const d = ctx[0].raw;
-                                    return `Note ${d.x}/10, âge ${ageBins[d.y].label}`;
+                                    var d = ctx[0].raw;
+                                    return 'Note '+d.x+'/10, âge '+ageBins[d.y].label;
                                 },
                                 label: function(ctx) {
-                                    const d = ctx.raw;
-                                    return `Nombre d'avis : ${d.v}`;
+                                    var d = ctx.raw;
+                                    return "Nombre d'avis : "+d.v;
                                 }
                             }
                         }
@@ -249,34 +249,34 @@
             });
 
             // Derniers commentaires
-            let commentsHtml = '';
+            var commentsHtml = '';
             notes
-                .filter(n => n.commentaire && n.commentaire.length)
+                .filter(function(n){ return n.commentaire && n.commentaire.length; })
                 .sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); }) // plus récents d'abord
                 .slice(0,10)
                 .forEach(function(n) {
-                    commentsHtml += `
-                    <div class="comment">
-                        <b>${(!n.nom || n.nom === "Anonyme") ? "Anonyme" : n.nom}</b> (${n.age ? n.age : "?"} ans)
-                        <br>
-                        <span class="note-emoji">${goutEmojis[n.gout]||""}</span>
-                        Goût : <b>${n.gout}/10</b> &nbsp; | &nbsp;
-                        <span class="note-emoji">${logoEmojis[n.logo]||""}</span>
-                        Logo : <b>${n.logo}/10</b>
-                        <br>
-                        <span style="color:#5c4d15;">${n.commentaire}</span>
-                        <br>
-                        <span style="font-size:0.8em;color:#bfa24a;">
-                            ${n.date ? new Date(n.date).toLocaleString("fr-FR") : ""}
-                        </span>
-                    </div>`;
+                    commentsHtml +=
+                    '<div class="comment">'
+                        + '<b>' + ((!n.nom || n.nom === "Anonyme") ? "Anonyme" : n.nom) + '</b> ('+(n.age ? n.age : "?")+' ans)'
+                        + '<br>'
+                        + '<span class="note-emoji">'+(goutEmojis[n.gout]||"")+'</span>'
+                        + 'Goût : <b>'+n.gout+'/10</b> &nbsp; | &nbsp; '
+                        + '<span class="note-emoji">'+(logoEmojis[n.logo]||"")+'</span>'
+                        + 'Logo : <b>'+n.logo+'/10</b>'
+                        + '<br>'
+                        + '<span style="color:#5c4d15;">'+n.commentaire+'</span>'
+                        + '<br>'
+                        + '<span style="font-size:0.8em;color:#bfa24a;">'
+                        + (n.date ? new Date(n.date).toLocaleString("fr-FR") : "")
+                        + '</span>'
+                    + '</div>';
                 });
             document.getElementById('comments').innerHTML = commentsHtml || "<i>Aucun commentaire pour l'instant.</i>";
         }
 
         // --- Ecoute Firestore en temps réel ---
         db.collection("notes").onSnapshot(function(snapshot) {
-            const notes = [];
+            var notes = [];
             snapshot.forEach(function(doc) { notes.push(doc.data()); });
             updateStats(notes);
         });
