@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Statistiques de Racine Dorée</title>
+    <title>Statistiques Racine Dorée</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -55,13 +55,13 @@
             margin: 0 0.4em;
         }
     </style>
-    <!-- Chart.js + Matrix plugin -->
+    <!-- Chart.js + Matrix plugin, UMD, dans cet ordre -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@4.0.1/dist/chartjs-chart-matrix.umd.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Statistiques Racine Dorée</h1>
+        <h1>Statistiques de Racine Dorée</h1>
         <div class="chart-section">
             <canvas id="notesChart" width="400" height="220"></canvas>
             <div id="statsInfo" style="margin-top:2em; text-align:center;"></div>
@@ -81,9 +81,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-
-        // Chart.js and Matrix plugin are already loaded in <head>
-        const { Chart } = window;
+        const { Chart } = window; // Chart.js est déjà chargé
 
         const firebaseConfig = {
             apiKey: "AIzaSyDeS8UJ0M688FRWtTHm0aYrt_v1r5mlbIo",
