@@ -58,10 +58,13 @@
     <!-- Chart.js + Matrix plugin, UMD, dans cet ordre -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@4.0.1/dist/chartjs-chart-matrix.umd.js"></script>
+    <!-- Firebase UMD -->
+    <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Statistiques de Racine Dorée</h1>
+        <h1>Statistiques Racine Dorée</h1>
         <div class="chart-section">
             <canvas id="notesChart" width="400" height="220"></canvas>
             <div id="statsInfo" style="margin-top:2em; text-align:center;"></div>
@@ -78,11 +81,8 @@
             <div id="comments"></div>
         </div>
     </div>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-        const { Chart } = window; // Chart.js est déjà chargé
-
+    <script>
+        // --- Firebase config UMD ---
         const firebaseConfig = {
             apiKey: "AIzaSyDeS8UJ0M688FRWtTHm0aYrt_v1r5mlbIo",
             authDomain: "gingerform.firebaseapp.com",
@@ -92,11 +92,14 @@
             appId: "1:215283939680:web:2835759898fbc524fb0605",
             measurementId: "G-LGG78H2T8G"
         };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
         const goutEmojis = ["🤢","😣","😖","😕","😐","🙂","😊","😋","😍","🤩","🍻"];
         const logoEmojis = ["💩","🙈","😑","😕","😐","🙂","👍","😍","🤩","🌟","🏆"];
+
+        let notesChartInstance = null;
+        let matrixChartInstance = null;
 
         function moyenne(arr) {
             return arr.length ? (arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(2) : 0;
@@ -106,9 +109,6 @@
             arr.forEach(val => dist[val]++);
             return dist;
         }
-
-        let notesChartInstance = null;
-        let matrixChartInstance = null;
 
         function updateStats(notes) {
             const goutNotes = notes.map(n => n.gout);
@@ -201,11 +201,13 @@
                     datasets: [{
                         label: "Votes Goût par âge",
                         data: matrixData,
-                        backgroundColor: ctx => colorForValue(ctx.dataset.data[ctx.dataIndex].v),
+                        backgroundColor: function(ctx) {
+                            return colorForValue(ctx.dataset.data[ctx.dataIndex].v);
+                        },
                         borderColor: "#ecd97f",
                         borderWidth: 1,
-                        width: ({chart}) => (chart.chartArea||{}).width/12,
-                        height: ({chart}) => (chart.chartArea||{}).height/ageBins.length
+                        width: function({chart}) { return (chart.chartArea||{}).width/12; },
+                        height: function({chart}) { return (chart.chartArea||{}).height/ageBins.length; }
                     }]
                 },
                 options: {
@@ -213,11 +215,11 @@
                         legend: {display:false},
                         tooltip: {
                             callbacks: {
-                                title: (ctx) => {
+                                title: function(ctx) {
                                     const d = ctx[0].raw;
                                     return `Note ${d.x}/10, âge ${ageBins[d.y].label}`;
                                 },
-                                label: (ctx) => {
+                                label: function(ctx) {
                                     const d = ctx.raw;
                                     return `Nombre d'avis : ${d.v}`;
                                 }
@@ -230,7 +232,7 @@
                             label: "Note goût",
                             min: -0.5, max: 10.5,
                             ticks: {
-                                callback: val => val>=0&&val<=10?val:""
+                                callback: function(val) { return val>=0&&val<=10?val:""; }
                             },
                             title: {display:true, text:"Note Goût (/10)"}
                         },
@@ -238,7 +240,7 @@
                             type: 'linear',
                             min: -0.5, max: ageBins.length-0.5,
                             ticks: {
-                                callback: val => ageBins[val]?ageBins[val].label:""
+                                callback: function(val) { return ageBins[val]?ageBins[val].label:""; }
                             },
                             title: {display:true, text:"Tranche d'âge"}
                         }
@@ -250,9 +252,9 @@
             let commentsHtml = '';
             notes
                 .filter(n => n.commentaire && n.commentaire.length)
-                .sort((a,b)=>(b.date||'').localeCompare(a.date||'')) // plus récents d'abord
+                .sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); }) // plus récents d'abord
                 .slice(0,10)
-                .forEach(n => {
+                .forEach(function(n) {
                     commentsHtml += `
                     <div class="comment">
                         <b>${(!n.nom || n.nom === "Anonyme") ? "Anonyme" : n.nom}</b> (${n.age ? n.age : "?"} ans)
@@ -272,10 +274,10 @@
             document.getElementById('comments').innerHTML = commentsHtml || "<i>Aucun commentaire pour l'instant.</i>";
         }
 
-        // Ecoute en temps réel Firestore
-        onSnapshot(collection(db, "notes"), (snapshot) => {
+        // --- Ecoute Firestore en temps réel ---
+        db.collection("notes").onSnapshot(function(snapshot) {
             const notes = [];
-            snapshot.forEach(doc => notes.push(doc.data()));
+            snapshot.forEach(function(doc) { notes.push(doc.data()); });
             updateStats(notes);
         });
     </script>
