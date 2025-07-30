@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Note ma bière ! V7</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         body {
             font-family: 'Quicksand', Arial, sans-serif;
@@ -178,11 +179,11 @@
             color: #5c4d15;
             box-shadow: 0 4px 16px #ecd97f70;
         }
-        /* Notification bandeau centré à l'écran */
+        /* Notification bandeau centré à l'écran et responsive */
         #msg {
             position: fixed;
-            left: 50%;
-            top: 50%;
+            left: 50vw;
+            top: 50vh;
             transform: translate(-50%, -50%);
             z-index: 9999;
             font-weight: bold;
@@ -193,10 +194,12 @@
             box-shadow: 0 2px 24px #ecd97f99, 0 1px 4px #f0e9d2;
             padding: 1.3em 2em;
             min-width: 210px;
+            max-width: 88vw;
+            word-break: break-word;
             text-align: center;
             transition: color 0.2s, background 0.2s, opacity 0.3s;
             letter-spacing: 1px;
-            display: none; /* hidden by default */
+            display: none;
             opacity: 0;
         }
         #msg.active {
@@ -210,7 +213,6 @@
             100% { transform: translate(-50%, -50%) scale(1); opacity: 1;}
         }
 
-        /* Mobile: logo au dessus du formulaire, centré */
         @media (max-width: 900px) {
             .main-flex {
                 flex-direction: column !important;
@@ -236,6 +238,12 @@
                 width: 98vw;
                 max-width: 98vw;
             }
+            #msg {
+                font-size: 1em;
+                min-width: 110px;
+                max-width: 96vw;
+                padding: 1em 1em;
+            }
         }
         @media (max-width: 600px) {
             .container,
@@ -247,6 +255,12 @@
             h1 {
                 font-size: 1.2em;
             }
+            #msg {
+                font-size: 0.98em;
+                min-width: 80px;
+                max-width: 96vw;
+                padding: 0.7em 0.7em;
+            }
         }
     </style>
 </head>
@@ -257,7 +271,7 @@
                 <img src="logo.png" alt="Logo Racine Dorée">
             </div>
             <form id="beerForm" class="form-card">
-                <h1>Note ma bière ! V7</h1>
+                <h1>Note ma Ginger !</h1>
                 <label>Nom :
                     <input type="text" name="nom" required placeholder="Ton prénom ou pseudo">
                 </label>
@@ -360,6 +374,8 @@
             const msgDiv = document.getElementById('msg');
             msgDiv.textContent = msg;
             msgDiv.classList.add("active");
+            msgDiv.style.opacity = "1";
+            msgDiv.style.display = "block";
             if (isError) {
                 msgDiv.style.background = "linear-gradient(90deg, #bfa24a 60%, #f44336 100%)";
                 msgDiv.style.color = "#fff";
@@ -372,7 +388,7 @@
                 msgDiv.style.opacity = "0";
                 setTimeout(() => {
                     msgDiv.style.display = "none";
-                }, 300);
+                }, 400);
             }, 4000);
         }
 
