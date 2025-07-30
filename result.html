@@ -5,10 +5,6 @@
     <title>Statistiques Racine Dorée</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Chart.js Matrix plugin for 3D-like heatmap -->
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@4.0.1/dist/chartjs-chart-matrix.min.js"></script>
     <style>
         body {
             font-family: 'Quicksand', Arial, sans-serif;
@@ -59,6 +55,9 @@
             margin: 0 0.4em;
         }
     </style>
+    <!-- Chart.js + Matrix plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@4.0.1/dist/chartjs-chart-matrix.umd.js"></script>
 </head>
 <body>
     <div class="container">
@@ -82,6 +81,11 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+        // Chart.js and Matrix plugin already loaded in <head>
+        const { Chart } = window;
+        const { MatrixController, MatrixElement } = window.chartjsChartMatrix;
+        Chart.register(MatrixController, MatrixElement);
 
         const firebaseConfig = {
             apiKey: "AIzaSyDeS8UJ0M688FRWtTHm0aYrt_v1r5mlbIo",
@@ -116,8 +120,10 @@
 
             // Histogramme
             const ctx = document.getElementById('notesChart').getContext('2d');
-            // Destroy previous chart if exists
-            if (notesChartInstance) notesChartInstance.destroy();
+            if (notesChartInstance) {
+                notesChartInstance.destroy();
+                notesChartInstance = null;
+            }
             notesChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -151,8 +157,7 @@
                 Moyenne logo : <b>${moyenne(logoNotes)} / 10</b> <br>
                 Nombre d'avis : <b>${notes.length}</b>`;
 
-            // --- 3D/heatmap chart : Goût vs âge ---
-            // Tranches d'âge
+            // --- Matrix chart : Goût vs âge ---
             const ageBins = [
                 {min:10, max:15, label:"10-15"},
                 {min:16, max:19, label:"16-19"},
@@ -183,16 +188,17 @@
             // Couleur heatmap
             function colorForValue(v) {
                 if (v === 0) return '#fffbe7';
-                // plus il y a de votes plus la couleur est foncée
                 const base = [255, 202, 99]; // jaune pâle
                 const max = [191, 162, 74]; // doré foncé
                 const ratio = Math.min(1,v/Math.max(1,Math.max(...notesMatrix.flat())));
                 const blend = base.map((b, idx) => Math.round(b + (max[idx]-b)*ratio));
                 return `rgb(${blend.join(',')})`;
             }
-            // Matrix chart
             const matrixCtx = document.getElementById('matrixChart').getContext('2d');
-            if (matrixChartInstance) matrixChartInstance.destroy();
+            if (matrixChartInstance) {
+                matrixChartInstance.destroy();
+                matrixChartInstance = null;
+            }
             matrixChartInstance = new Chart(matrixCtx, {
                 type: 'matrix',
                 data: {
