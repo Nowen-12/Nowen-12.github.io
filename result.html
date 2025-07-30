@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Statistiques Racine Dorée</title>
+    <title>Statistiques de Racine Dorée</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -82,10 +82,8 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-        // Chart.js and Matrix plugin already loaded in <head>
+        // Chart.js and Matrix plugin are already loaded in <head>
         const { Chart } = window;
-        const { MatrixController, MatrixElement } = window.chartjsChartMatrix;
-        Chart.register(MatrixController, MatrixElement);
 
         const firebaseConfig = {
             apiKey: "AIzaSyDeS8UJ0M688FRWtTHm0aYrt_v1r5mlbIo",
